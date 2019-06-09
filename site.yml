@@ -1,0 +1,48 @@
+---
+
+- name: Bootstrap
+  hosts: all
+  become: yes
+  gather_facts: False
+  tasks:
+  - name: Install Python 2
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+  - name: Create bird dir
+    file:
+      path: /opt/bird6
+      state: directory
+
+- name: Install & Configure BIRD
+  hosts: routers
+  vars:
+    bird_ipv6_includes: ["/opt/bird6/*"]
+  become: yes
+  roles:
+    - { role: "logan2211.bird" }
+
+- name: Setup routers
+  hosts: routers
+  become: yes
+  tasks:
+  - name: Configure interface
+    template:
+      src: "templates/{{ item }}.yml.j2"
+      dest: "/etc/netplan/99-{{ item }}.yaml"
+    with_items:
+      - backbone
+      - loopback
+    notify:
+    - apply netplan
+  - name: Configure routing
+    template:
+      src: "templates/routing.conf.j2"
+      dest: "/opt/bird6/routing.conf"
+    notify:
+    - reload bird6
+  handlers:
+  - name: apply netplan
+    command: netplan apply
+  - name: reload bird6
+    service:
+      name: bird6
+      state: reloaded

@@ -1,0 +1,3 @@
+- src: https://github.com/logan2211/ansible-bird
+  version: "1.6"
+  name: logan2211.bird

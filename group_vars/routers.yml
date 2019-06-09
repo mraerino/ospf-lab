@@ -1,0 +1,4 @@
+---
+
+bird_ipv4_enabled: False
+bird_ipv6_enabled: True

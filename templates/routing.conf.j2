@@ -1,0 +1,19 @@
+protocol direct loopback {
+  interface "lo";
+}
+
+# loopback
+filter export_ospf {
+  if proto = "loopback" then accept;
+  reject;
+}
+
+protocol ospf backbone {
+  export filter export_ospf;
+  area 0 {
+    interface "enp0s8";
+    interface "lo" {
+      stub;
+    };
+  };
+}

@@ -1,0 +1,4 @@
+---
+
+bird_router_id: 10.0.2.1
+loopback_addr: fdf2:cf05:48c8::201/128
